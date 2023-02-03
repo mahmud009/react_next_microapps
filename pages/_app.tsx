@@ -1,6 +1,13 @@
-import '@/styles/globals.css'
-import type { AppProps } from 'next/app'
+import type { AppProps } from "next/app";
+import React from "react";
+import { ColorPicker } from "features/colorPicker";
+import { Box } from "components/reusables";
+import { ChessGame } from "features/chess";
 
 export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+  return (
+    <Box>
+      <ChessGame />
+    </Box>
+  );
 }
