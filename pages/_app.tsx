@@ -3,6 +3,7 @@ import React from "react";
 import { ColorPicker } from "features/colorPicker";
 import { Box } from "components/reusables";
 import { ChessGame } from "features/chess";
+import "styles/globals.scss";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (

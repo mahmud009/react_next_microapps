@@ -5,17 +5,18 @@ import { FaChessPawn, FaChessQueen } from "react-icons/fa";
 import { Text } from "components/reusables/Text";
 import { Game } from "./chess";
 
-let cellSize = 84;
-let highlighterSize = 48;
+let cellSize = 64;
+let pieceSize = 42;
+let highlighterSize = 42;
 let game = new Game();
 let colors = {
   cell: {
-    light: `#EADDCA`,
-    dark: `#D2B48C`,
+    light: `#333446`,
+    dark: `#1C1D31`,
   },
   piece: {
-    light: `#CD7F32`,
-    dark: `#383838`,
+    light: `#2CD9A1`,
+    dark: `#F86A9A`,
   },
   validCell: "#A52A2A",
 };
@@ -29,12 +30,19 @@ export function ChessGame() {
 
   const handleMove = (cell: any) => {
     let board = game.getValidMoves(cell);
-    // console.log(board);
-    setBoard(board);
+    setBoard([...board]);
   };
 
   return (
-    <Box fontFamily={"Poppins"}>
+    <Box
+      fontFamily={"Poppins"}
+      width="100%"
+      height="100vh"
+      overflow={"hidden"}
+      display="flex"
+      alignItems={"center"}
+      justifyContent="center"
+    >
       {/* board */}
       <Box
         width={`${cellSize * 8}px`}
@@ -42,12 +50,15 @@ export function ChessGame() {
         display="grid"
         gridTemplateColumns={`repeat(${8}, 1fr)`}
         gridTemplateRows={`repeat(${8}, 1fr)`}
+        border="1px solid #405266"
       >
         {board.length > 0
           ? board.map((cell, idx) => {
               let coords = cell.coords;
-              let piece = cell.piece;
+              let piece = cell.piece[1];
               let isDark = (coords.x + coords.y) % 2 == 0;
+              let pieceTeam = "";
+              if (piece) pieceTeam = cell.piece[0];
 
               return (
                 <Box
@@ -69,11 +80,13 @@ export function ChessGame() {
                     top="50%"
                     left="50%"
                     transform={"translate(-50%, -50%)"}
-                    fontSize="48px"
-                    color={colors.piece.dark}
+                    fontSize={`${pieceSize}px`}
+                    color={
+                      pieceTeam == "A" ? colors.piece.dark : colors.piece.light
+                    }
                   >
-                    {piece == 1 ? <FaChessPawn /> : null}
-                    {piece == 9 ? <FaChessQueen /> : null}
+                    {piece == 2 ? <FaChessPawn /> : null}
+                    {piece == 6 ? <FaChessQueen /> : null}
                   </Box>
                   {cell.isValidMove ? (
                     <Box
@@ -91,7 +104,12 @@ export function ChessGame() {
                     />
                   ) : null}
                   <Box position="absolute" bottom={"0"} right="0">
-                    <Text fontSize={"16px"} lineHeight="1" margin={0}>
+                    <Text
+                      fontSize={"12px"}
+                      lineHeight="1"
+                      margin={0}
+                      color={colors.validCell}
+                    >
                       {coords.x}, {coords.y}
                     </Text>
                   </Box>
