@@ -6,7 +6,7 @@ import { Text } from "components/reusables/Text";
 import { Game } from "./chess";
 
 let cellSize = 64;
-let pieceSize = 42;
+let pieceSize = 56;
 let highlighterSize = 42;
 let game = new Game();
 let colors = {
@@ -15,21 +15,29 @@ let colors = {
     dark: `#1C1D31`,
   },
   piece: {
-    light: `#2CD9A1`,
-    dark: `#F86A9A`,
+    light: `#84C69B`,
+    dark: `#7B6CF6`,
   },
   validCell: "#A52A2A",
 };
 
 export function ChessGame() {
   const [board, setBoard] = useState<any[]>([]);
+  const [lockedCell, setLockedCell] = useState<any>(null);
 
   React.useEffect(() => {
     setBoard(game.board);
   }, []);
 
   const handleMove = (cell: any) => {
+    if (lockedCell) {
+      let board = game.movePiece(lockedCell, cell);
+      setBoard(board);
+      setLockedCell(null);
+      return;
+    }
     let board = game.getValidMoves(cell);
+    setLockedCell(cell.piece ? cell : null);
     setBoard([...board]);
   };
 
@@ -55,7 +63,7 @@ export function ChessGame() {
         {board.length > 0
           ? board.map((cell, idx) => {
               let coords = cell.coords;
-              let piece = cell.piece[1];
+              let piece = cell.piece ? cell.piece[1] : null;
               let isDark = (coords.x + coords.y) % 2 == 0;
               let pieceTeam = "";
               if (piece) pieceTeam = cell.piece[0];
@@ -74,6 +82,7 @@ export function ChessGame() {
                   lineHeight={1}
                   position="relative"
                   onClick={() => handleMove(cell)}
+                  cursor={piece ? "pointer" : "inherit"}
                 >
                   <Box
                     position="absolute"
@@ -82,11 +91,16 @@ export function ChessGame() {
                     transform={"translate(-50%, -50%)"}
                     fontSize={`${pieceSize}px`}
                     color={
-                      pieceTeam == "A" ? colors.piece.dark : colors.piece.light
+                      pieceTeam == "A" ? colors.piece.light : colors.piece.dark
                     }
+                    pointerEvents="none"
                   >
-                    {piece == 2 ? <FaChessPawn /> : null}
-                    {piece == 6 ? <FaChessQueen /> : null}
+                    {piece == 1 ? <>&#9818;</> : null}
+                    {piece == 2 ? <>&#9823;</> : null}
+                    {piece == 3 ? <>&#9822;</> : null}
+                    {piece == 4 ? <>&#9821;</> : null}
+                    {piece == 5 ? <>&#9820;</> : null}
+                    {piece == 6 ? <>&#9819;</> : null}
                   </Box>
                   {cell.isValidMove ? (
                     <Box

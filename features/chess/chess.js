@@ -15,6 +15,14 @@ class Vec {
     });
     return sum;
   }
+
+  static isInsideRectBound(vec, rect) {
+    return vec.x <= rect.x && vec.y <= rect.y && vec.x >= 1 && vec.y >= 1;
+  }
+
+  static calcFlatIndex(vec) {
+    return (vec.y - 1) * boardSize + vec.x - 1;
+  }
 }
 
 let boardSize = 8;
@@ -28,7 +36,19 @@ let pieces = {
   queen: 6,
 };
 
+let pieceMap = [
+  [null, null, "A2", null, null, null, null, null], //
+  [null, null, null, null, null, null, null, null], //
+  [null, null, null, null, null, null, null, null], //
+  [null, null, null, null, null, null, null, null], //
+  [null, null, null, null, null, null, null, null], //
+  [null, null, "B2", null, null, null, null, null], //
+  ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"], //
+  ["A5", "A3", "A4", "A6", "A1", "A4", "A3", "A5"], //
+];
+
 let moveDirections = {
+  2: [new Vec(0, -1)],
   6: [
     new Vec(1, 1),
     new Vec(-1, -1),
@@ -41,68 +61,86 @@ let moveDirections = {
   ],
 };
 
-function calcCellIndex(vec) {
-  return (vec.y - 1) * boardSize + vec.x - 1;
-}
-
 export class Game {
   constructor() {
     this.board = [];
-    for (let i = 1; i <= 64; i++) {
-      this.board.push({
-        piece:
-          i == 29
-            ? teamPrefix[0] + pieces.queen
-            : i == 11
-            ? teamPrefix[1] + pieces.pawn
-            : i == 37
-            ? teamPrefix[1] + pieces.pawn
-            : "",
-        isValidMove: false,
-        coords: new Vec(
-          i % boardSize == 0 ? boardSize : i % boardSize,
-          Math.ceil(i / boardSize)
-        ),
-      });
-    }
+    pieceMap.map((row, y) =>
+      row.map((_, x) => {
+        let cell = {
+          piece: pieceMap[y][x],
+          isValidMove: false,
+          coords: new Vec(x + 1, y + 1),
+        };
+        this.board.push(cell);
+      })
+    );
   }
 }
 
 function createMoves(cell, board) {
+  let moves = [];
   let pieceId = Number(cell.piece[1]);
-  let team = cell.piece[0];
-  switch (pieceId) {
-    case pieces.queen:
-      let directions = moveDirections[pieceId];
-      directions.forEach((dir) => {
-        let coords = Vec.sum(cell.coords, dir);
-        while (
-          coords.x <= 8 &&
-          coords.y <= 8 &&
-          coords.x >= 1 &&
-          coords.y >= 1
-        ) {
-          let cellIndex = calcCellIndex(coords);
-          let blockedPiece = board[cellIndex].piece;
-          if (blockedPiece) {
-            board[cellIndex].isValidMove = blockedPiece[0] != team;
-            break;
-          }
-          board[calcCellIndex(coords)].isValidMove = true;
-          coords = Vec.sum(coords, dir);
+  let pieceTeam = cell.piece[0];
+  let boardRect = new Vec(boardSize, boardSize);
+  let directions = moveDirections[pieceId];
 
-          // nextCell = board[calcCellIndex(coords)];
+  if (pieceId == pieces.queen) {
+    directions.forEach((direction) => {
+      let nextCell = Vec.sum(cell.coords, direction);
+      while (Vec.isInsideRectBound(nextCell, boardRect)) {
+        let cellIndex = Vec.calcFlatIndex(nextCell);
+        let blockedPiece = board[cellIndex].piece;
+        if (blockedPiece) {
+          let isSameTeam = blockedPiece[0] == pieceTeam;
+          if (isSameTeam) break;
+          moves.push(nextCell);
+          break;
         }
-      });
-      return board;
+        moves.push(nextCell);
+        nextCell = Vec.sum(nextCell, direction);
+      }
+    });
   }
 
-  return board;
+  if (pieceId == pieces.pawn) {
+    directions.forEach((direction) => {
+      let nextCell = Vec.sum(cell.coords, direction);
+      if (Vec.isInsideRectBound(nextCell, boardRect)) {
+        moves.push(nextCell);
+      }
+    });
+  }
+
+  return moves;
+}
+
+function movePiece(currCell, destCell, board) {
+  let piece = currCell.piece;
+  return board.map((cell, idx) => {
+    let isCurrCell = idx == Vec.calcFlatIndex(currCell.coords);
+    let isDestCell = idx == Vec.calcFlatIndex(destCell.coords);
+    if (isCurrCell) cell.piece = null;
+    if (isDestCell) cell.piece = piece;
+    return { ...cell, isValidMove: false };
+  });
 }
 
 Game.prototype.getValidMoves = function (cell) {
-  let piece = cell.piece;
-  let coords = cell.coords;
-  this.board = createMoves(cell, this.board);
+  this.board = this.board.map((cell) => ({ ...cell, isValidMove: false }));
+  if (!cell.piece) return this.board;
+  let moves = createMoves(cell, this.board);
+  moves.forEach((move) => {
+    this.board[Vec.calcFlatIndex(move)].isValidMove = true;
+  });
+  return this.board;
+};
+
+Game.prototype.movePiece = function (currCell, destCell) {
+  let moves = createMoves(currCell, this.board);
+  let destCoords = destCell.coords;
+  let isValidDest = moves.some((coords) => Vec.isEqual(coords, destCoords));
+  if (isValidDest) {
+    this.board = movePiece(currCell, destCell, this.board);
+  }
   return this.board;
 };
