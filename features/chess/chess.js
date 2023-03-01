@@ -41,7 +41,7 @@ let pieceMap = [
   [null, null, null, null, null, null, null, null], //
   [null, null, null, null, null, null, null, null], //
   [null, null, null, null, null, null, null, null], //
-  [null, null, null, null, null, null, null, null], //
+  [null, null, null, null, null, "B4", null, null], //
   [null, null, "B2", null, null, null, null, null], //
   ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"], //
   ["A5", "A3", "A4", "A6", "A1", "A4", "A3", "A5"], //
@@ -103,11 +103,20 @@ function createMoves(cell, board) {
   }
 
   if (pieceId == pieces.pawn) {
+    let isInitial = cell.coords.y == 7;
     directions.forEach((direction) => {
-      let nextCell = Vec.sum(cell.coords, direction);
-      if (Vec.isInsideRectBound(nextCell, boardRect)) {
-        moves.push(nextCell);
+      let coordsQueue = [];
+      let nextCellCoords = Vec.sum(cell.coords, direction);
+      coordsQueue.push(nextCellCoords);
+      if (isInitial) {
+        nextCellCoords = Vec.sum(nextCellCoords, direction);
+        coordsQueue.push(nextCellCoords);
       }
+      coordsQueue.forEach((coords) => {
+        if (Vec.isInsideRectBound(coords, boardRect)) {
+          moves.push(coords);
+        }
+      });
     });
   }
 
