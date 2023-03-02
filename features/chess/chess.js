@@ -7,6 +7,27 @@ class Vec {
     return vec1.x == vec2.x && vec1.y == vec2.y;
   }
 
+  static isDiagonal(matrix) {
+    // Check if the input is a square matrix
+    const numRows = matrix.length;
+    const numCols = matrix[0].length;
+    if (numRows !== numCols) {
+      return false;
+    }
+
+    // Check if all non-diagonal elements are zero
+    for (let i = 0; i < numRows; i++) {
+      for (let j = 0; j < numCols; j++) {
+        if (i !== j && matrix[i][j] !== 0) {
+          return false;
+        }
+      }
+    }
+
+    // If all non-diagonal elements are zero, return true
+    return true;
+  }
+
   static sum(...vectors) {
     let sum = new Vec(0, 0);
     vectors.forEach((vector) => {
@@ -41,10 +62,12 @@ let pieceMap = [
   [null, null, null, null, null, null, null, null], //
   [null, null, null, null, null, null, null, null], //
   [null, null, null, null, null, null, null, null], //
-  [null, null, null, null, null, "B4", null, null], //
+  [null, null, null, null, null, "A6", null, null], //
   [null, null, "B2", null, null, null, null, null], //
-  ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"], //
-  ["A5", "A3", "A4", "A6", "A1", "A4", "A3", "A5"], //
+  [null, null, "B2", null, null, null, null, null], //
+  [null, null, "B2", null, null, null, null, null], //
+  // ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"], //
+  // ["A5", "A3", "A4", "A6", "A1", "A4", "A3", "A5"], //
 ];
 
 let moveDirections = {
@@ -61,6 +84,18 @@ let moveDirections = {
   ],
 };
 
+class Matrix {
+  constructor(width, height) {
+    this.data = [];
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        this.data[y * width + x] = null;
+      }
+    }
+    return this.data;
+  }
+}
+
 export class Game {
   constructor() {
     this.board = [];
@@ -74,6 +109,17 @@ export class Game {
         this.board.push(cell);
       })
     );
+  }
+}
+
+class MoveGenerator {
+  constructor(cell, board) {
+    this.moves = [];
+    this.board = board;
+    this.pieceId = Number(cell.piece[1]);
+    this.pieceTeam = cell.piece[0];
+    this.boardRect = new Vec(boardSize, boardSize);
+    this.directions = moveDirections[pieceId];
   }
 }
 
@@ -106,11 +152,9 @@ function createMoves(cell, board) {
     let isInitial = cell.coords.y == 7;
     directions.forEach((direction) => {
       let coordsQueue = [];
-      let nextCellCoords = Vec.sum(cell.coords, direction);
-      coordsQueue.push(nextCellCoords);
+      coordsQueue.push(Vec.sum(cell.coords, direction));
       if (isInitial) {
-        nextCellCoords = Vec.sum(nextCellCoords, direction);
-        coordsQueue.push(nextCellCoords);
+        coordsQueue.push(Vec.sum(cell.coords, direction));
       }
       coordsQueue.forEach((coords) => {
         if (Vec.isInsideRectBound(coords, boardRect)) {
