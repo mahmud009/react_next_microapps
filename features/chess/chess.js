@@ -59,40 +59,48 @@ let pieces = {
 
 let pieceMap = [
   [null, null, "A2", null, null, null, null, null], //
+  [null, null, "B1", null, null, null, null, null], //
   [null, null, null, null, null, null, null, null], //
-  [null, null, null, null, null, null, null, null], //
-  [null, null, null, null, null, null, null, null], //
-  [null, null, null, null, null, "A6", null, null], //
-  [null, null, "B2", null, null, null, null, null], //
-  [null, null, "B2", null, null, null, null, null], //
-  [null, null, "B2", null, null, null, null, null], //
-  // ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"], //
-  // ["A5", "A3", "A4", "A6", "A1", "A4", "A3", "A5"], //
+  [null, null, null, null, "A5", null, null, null], //
+  [null, "A1", null, "B5", null, null, null, null], //
+  [null, null, null, null, null, null, "A1", null], //
+  ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"], //
+  ["A5", "A3", "A4", "A6", "A1", "A4", "A3", "A5"], //
 ];
 
 let moveDirections = {
   2: [new Vec(0, -1)],
+  4: [new Vec(1, 1), new Vec(-1, -1), new Vec(1, -1), new Vec(-1, 1)],
+  5: [new Vec(0, 1), new Vec(0, -1), new Vec(1, 0), new Vec(-1, 0)],
   6: [
-    new Vec(1, 1),
-    new Vec(-1, -1),
-    new Vec(-1, 1),
-    new Vec(1, -1),
-    new Vec(0, 1),
-    new Vec(1, 0),
-    new Vec(0, -1),
-    new Vec(-1, 0),
+    new Vec(1, 1), // bottom-right-diagonal
+    new Vec(-1, -1), // top-left-diagonal
+    new Vec(-1, 1), // botto,-left-diagonal
+    new Vec(1, -1), // top-right-diagonal
+    new Vec(0, 1), // bottom
+    new Vec(1, 0), // right
+    new Vec(0, -1), // top
+    new Vec(-1, 0), // left
   ],
 };
 
 class Matrix {
   constructor(width, height) {
     this.data = [];
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        this.data[y * width + x] = null;
+    for (let y = 1; y <= height; y++) {
+      for (let x = 1; x <= width; x++) {
+        this.data[Vec.calcFlatIndex({ x, y })] = null;
       }
     }
+  }
+  add(cell, coords) {
+    let index = Vec.calcFlatIndex(coords);
+    this.data[index] = cell;
     return this.data;
+  }
+
+  static isInsideRectBound(vec, rect) {
+    return vec.x <= rect.x && vec.y <= rect.y && vec.x >= 1 && vec.y >= 1;
   }
 }
 
@@ -112,17 +120,6 @@ export class Game {
   }
 }
 
-class MoveGenerator {
-  constructor(cell, board) {
-    this.moves = [];
-    this.board = board;
-    this.pieceId = Number(cell.piece[1]);
-    this.pieceTeam = cell.piece[0];
-    this.boardRect = new Vec(boardSize, boardSize);
-    this.directions = moveDirections[pieceId];
-  }
-}
-
 function createMoves(cell, board) {
   let moves = [];
   let pieceId = Number(cell.piece[1]);
@@ -130,7 +127,11 @@ function createMoves(cell, board) {
   let boardRect = new Vec(boardSize, boardSize);
   let directions = moveDirections[pieceId];
 
-  if (pieceId == pieces.queen) {
+  if (
+    pieceId == pieces.queen ||
+    pieceId == pieces.bishop ||
+    pieceId == pieces.rook
+  ) {
     directions.forEach((direction) => {
       let nextCell = Vec.sum(cell.coords, direction);
       while (Vec.isInsideRectBound(nextCell, boardRect)) {
@@ -150,6 +151,13 @@ function createMoves(cell, board) {
 
   if (pieceId == pieces.pawn) {
     let isInitial = cell.coords.y == 7;
+    let diagonalCells = {
+      topLeftCell:
+        board[Vec.calcFlatIndex(Vec.sum(cell.coords, new Vec(1, -1)))],
+      topRightCell:
+        board[Vec.calcFlatIndex(Vec.sum(cell.coords, new Vec(-1, 1)))],
+    };
+    console.log(diagonalCells);
     directions.forEach((direction) => {
       let coordsQueue = [];
       coordsQueue.push(Vec.sum(cell.coords, direction));
