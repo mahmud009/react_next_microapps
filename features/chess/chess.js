@@ -7,27 +7,6 @@ class Vec {
     return vec1.x == vec2.x && vec1.y == vec2.y;
   }
 
-  static isDiagonal(matrix) {
-    // Check if the input is a square matrix
-    const numRows = matrix.length;
-    const numCols = matrix[0].length;
-    if (numRows !== numCols) {
-      return false;
-    }
-
-    // Check if all non-diagonal elements are zero
-    for (let i = 0; i < numRows; i++) {
-      for (let j = 0; j < numCols; j++) {
-        if (i !== j && matrix[i][j] !== 0) {
-          return false;
-        }
-      }
-    }
-
-    // If all non-diagonal elements are zero, return true
-    return true;
-  }
-
   static sum(...vectors) {
     let sum = new Vec(0, 0);
     vectors.forEach((vector) => {
@@ -62,14 +41,14 @@ let pieceMap = [
   [null, null, "B1", null, null, null, null, null], //
   [null, null, null, null, null, null, null, null], //
   [null, null, null, null, "A5", null, null, null], //
-  [null, "A1", null, "B5", null, null, null, null], //
-  [null, null, null, null, null, null, "A1", null], //
+  [null, null, "B3", null, null, null, null, null], //
+  [null, "B3", null, null, "A4", "B4", "B4", null], //
   ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"], //
   ["A5", "A3", "A4", "A6", "A1", "A4", "A3", "A5"], //
 ];
 
 let moveDirections = {
-  2: [new Vec(0, -1)],
+  2: [new Vec(0, -1), new Vec(1, -1), new Vec(-1, -1)],
   4: [new Vec(1, 1), new Vec(-1, -1), new Vec(1, -1), new Vec(-1, 1)],
   5: [new Vec(0, 1), new Vec(0, -1), new Vec(1, 0), new Vec(-1, 0)],
   6: [
@@ -99,8 +78,35 @@ class Matrix {
     return this.data;
   }
 
-  static isInsideRectBound(vec, rect) {
-    return vec.x <= rect.x && vec.y <= rect.y && vec.x >= 1 && vec.y >= 1;
+  static isDiagonal(posA, posB) {
+    let digonalDirs = [
+      new Vec(-1, -1),
+      new Vec(1, -1),
+      new Vec(1, 1),
+      new Vec(-1, 1),
+    ];
+    for (let dir of digonalDirs) {
+      if (Vec.isEqual(Vec.sum(posA, dir), posB)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static isInsideBound(vec, matrixLength) {
+    let lx = matrixLength;
+    let ly = matrixLength;
+    return vec.x <= lx && vec.x >= 1 && vec.y <= ly && vec.y >= 1;
+  }
+
+  static findCellByPos(pos, board) {
+    return board[Vec.calcFlatIndex(pos)];
+  }
+
+  static getRelativeCell(pos, vec, matrix) {
+    let relativeVec = Vec.sum(pos, vec);
+    if (!Matrix.isInsideBound(relativeVec, boardSize)) return null;
+    return matrix[calcFlatIndex(Vec.sum(pos, vec))];
   }
 }
 
@@ -118,6 +124,13 @@ export class Game {
       })
     );
   }
+}
+
+function isOpponent(cellA, cellB) {
+  let pieceA = cellA.piece;
+  let pieceB = cellB.piece;
+  if (pieceA && pieceB && pieceA[0] !== pieceB[0]) return true;
+  return false;
 }
 
 function createMoves(cell, board) {
@@ -151,25 +164,29 @@ function createMoves(cell, board) {
 
   if (pieceId == pieces.pawn) {
     let isInitial = cell.coords.y == 7;
-    let diagonalCells = {
-      topLeftCell:
-        board[Vec.calcFlatIndex(Vec.sum(cell.coords, new Vec(1, -1)))],
-      topRightCell:
-        board[Vec.calcFlatIndex(Vec.sum(cell.coords, new Vec(-1, 1)))],
-    };
-    console.log(diagonalCells);
-    directions.forEach((direction) => {
-      let coordsQueue = [];
-      coordsQueue.push(Vec.sum(cell.coords, direction));
-      if (isInitial) {
-        coordsQueue.push(Vec.sum(cell.coords, direction));
-      }
-      coordsQueue.forEach((coords) => {
-        if (Vec.isInsideRectBound(coords, boardRect)) {
-          moves.push(coords);
+    let isDiagonalEnemy = false;
+    let isBlocked = false;
+    for (let dir of directions) {
+      let nextCellPos = Vec.sum(cell.coords, dir);
+      let isDiagonal = Matrix.isDiagonal(cell.coords, nextCellPos);
+      if (Matrix.isInsideBound(nextCellPos, boardSize)) {
+        let nextCell = Matrix.findCellByPos(nextCellPos, board);
+        let isDiagonalOpp = isDiagonal && isOpponent(cell, nextCell);
+        isBlocked = !isDiagonal && !!nextCell.piece;
+        if (isDiagonalOpp) {
+          isDiagonalEnemy = true;
+          moves.push(nextCellPos);
         }
-      });
-    });
+        if (!isBlocked && !isDiagonal) moves.push(nextCellPos);
+      }
+    }
+    if (!isDiagonalEnemy && !isBlocked && isInitial) {
+      let extCoords = Vec.sum(cell.coords, new Vec(0, -2));
+      let extCell = Matrix.findCellByPos(extCoords, board);
+      let isExtBlocked = !!extCell.piece;
+      !isExtBlocked && moves.push(Vec.sum(cell.coords, new Vec(0, -2)));
+      console.log("initial move");
+    }
   }
 
   return moves;
