@@ -1,10 +1,20 @@
 class Vec {
   constructor(x, y) {
     this.x = x;
-    this.y = y;
+    this.y = y !== undefined ? y : x;
   }
   static isEqual(vec1, vec2) {
     return vec1.x == vec2.x && vec1.y == vec2.y;
+  }
+
+  static addScalar(vec, num) {
+    return new Vec(vec.x + num, vec.y + num);
+  }
+
+  sum({ x, y }) {
+    this.x += x;
+    this.y += y;
+    return this;
   }
 
   static sum(...vectors) {
@@ -16,52 +26,18 @@ class Vec {
     return sum;
   }
 
-  static isInsideRectBound(vec, rect) {
-    return vec.x <= rect.x && vec.y <= rect.y && vec.x >= 1 && vec.y >= 1;
+  static multiplyByScalar(vec, num) {
+    return new Vec(vec.x * num, vec.y * num);
   }
 
   static calcFlatIndex(vec) {
     return (vec.y - 1) * boardSize + vec.x - 1;
   }
+
+  static moveTo(fromVec, dirVec, step) {
+    return Vec.sum(fromVec, Vec.multiplyByScalar(dirVec, step));
+  }
 }
-
-let boardSize = 8;
-let teamPrefix = ["A", "B"];
-let pieces = {
-  king: 1,
-  pawn: 2,
-  knight: 3,
-  bishop: 4,
-  rook: 5,
-  queen: 6,
-};
-
-let pieceMap = [
-  [null, null, "A2", null, null, null, null, null], //
-  [null, null, "B1", null, null, null, null, null], //
-  [null, null, null, null, null, null, null, null], //
-  [null, null, null, null, "A5", null, null, null], //
-  [null, null, "B3", null, null, null, null, null], //
-  [null, "B3", null, null, "A4", "B4", "B4", null], //
-  ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"], //
-  ["A5", "A3", "A4", "A6", "A1", "A4", "A3", "A5"], //
-];
-
-let moveDirections = {
-  2: [new Vec(0, -1), new Vec(1, -1), new Vec(-1, -1)],
-  4: [new Vec(1, 1), new Vec(-1, -1), new Vec(1, -1), new Vec(-1, 1)],
-  5: [new Vec(0, 1), new Vec(0, -1), new Vec(1, 0), new Vec(-1, 0)],
-  6: [
-    new Vec(1, 1), // bottom-right-diagonal
-    new Vec(-1, -1), // top-left-diagonal
-    new Vec(-1, 1), // botto,-left-diagonal
-    new Vec(1, -1), // top-right-diagonal
-    new Vec(0, 1), // bottom
-    new Vec(1, 0), // right
-    new Vec(0, -1), // top
-    new Vec(-1, 0), // left
-  ],
-};
 
 class Matrix {
   constructor(width, height) {
@@ -93,22 +69,65 @@ class Matrix {
     return false;
   }
 
-  static isInsideBound(vec, matrixLength) {
-    let lx = matrixLength;
-    let ly = matrixLength;
-    return vec.x <= lx && vec.x >= 1 && vec.y <= ly && vec.y >= 1;
+  static isInsideBound(vec, rectSize) {
+    return vec.x <= rectSize && vec.x >= 1 && vec.y <= rectSize && vec.y >= 1;
   }
 
   static findCellByPos(pos, board) {
     return board[Vec.calcFlatIndex(pos)];
   }
-
-  static getRelativeCell(pos, vec, matrix) {
-    let relativeVec = Vec.sum(pos, vec);
-    if (!Matrix.isInsideBound(relativeVec, boardSize)) return null;
-    return matrix[calcFlatIndex(Vec.sum(pos, vec))];
-  }
 }
+
+let boardSize = 8;
+let teamPrefix = ["A", "B"];
+let pieces = {
+  king: 1,
+  pawn: 2,
+  knight: 3,
+  bishop: 4,
+  rook: 5,
+  queen: 6,
+};
+
+let pieceMap = [
+  [null, null, "A2", null, null, null, null, "A6"], //
+  [null, null, "B1", null, null, null, null, null], //
+  [null, null, null, "B1", null, "A1", null, null], //
+  [null, null, null, null, "A2", null, null, null], //
+  [null, null, null, null, null, null, null, null], //
+  [null, "B3", null, null, "A4", "B4", "B4", null], //
+  ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"], //
+  ["A5", "A3", "A4", "A6", "A1", "A4", "A3", "A5"], //
+];
+
+// angle based directions
+// 0, 45, 90, 135, 180, 225, 270, 315
+
+// new Vec(1, 1), // bottom-right-diagonal
+// new Vec(-1, -1), // top-left-diagonal
+// new Vec(-1, 1), // botto,-left-diagonal
+// new Vec(1, -1), // top-right-diagonal
+// new Vec(0, 1), // bottom
+// new Vec(1, 0), // right
+// new Vec(0, -1), // top
+// new Vec(-1, 0), // left
+
+let moveDirections = {
+  2: [new Vec(0, -1)],
+  3: [new Vec(0, -1), new Vec(0, 1), new Vec(-1, 0), new Vec(1, 0)],
+  4: [new Vec(1, 1), new Vec(-1, -1), new Vec(1, -1), new Vec(-1, 1)],
+  5: [new Vec(0, 1), new Vec(0, -1), new Vec(1, 0), new Vec(-1, 0)],
+  6: [
+    new Vec(1, 1),
+    new Vec(-1, -1),
+    new Vec(-1, 1),
+    new Vec(1, -1),
+    new Vec(0, 1),
+    new Vec(1, 0),
+    new Vec(0, -1),
+    new Vec(-1, 0),
+  ],
+};
 
 export class Game {
   constructor() {
@@ -126,70 +145,96 @@ export class Game {
   }
 }
 
-function isOpponent(cellA, cellB) {
-  let pieceA = cellA.piece;
-  let pieceB = cellB.piece;
-  if (pieceA && pieceB && pieceA[0] !== pieceB[0]) return true;
-  return false;
+class MovementSys {
+  constructor(cell, board) {
+    this.moves = [];
+    this.cell = cell;
+    let pieceId = Number(this.cell.piece[1]);
+    let dirs = moveDirections[pieceId];
+    console.log([6].includes(pieceId));
+    if ([pieces.queen, pieces.bishop, pieces.rook].includes(pieceId)) {
+      this.moves = MovementSys.genLinearMoves(
+        cell,
+        dirs,
+        board,
+        boardSize,
+        true
+      );
+    }
+    if (pieceId == pieces.pawn) {
+      this.moves = MovementSys.genPawnMove(cell, dirs, board);
+    }
+    if (pieceId == pieces.knight) {
+      this.moves = MovementSys.genLShapedMoves(cell, dirs, board);
+    }
+  }
+
+  static genLinearMoves(cell, directions, board, distance, captureEdge) {
+    let moves = [];
+    for (let dir of directions) {
+      for (let step = 1; step <= distance; step++) {
+        let destCoord = Vec.moveTo(cell.coords, dir, step);
+        if (!Matrix.isInsideBound(destCoord, boardSize)) break;
+        let destCell = Matrix.findCellByPos(destCoord, board);
+        let isBlocked = !!destCell.piece;
+        let isEnemy = !isEqualTeam(cell.piece, destCell.piece);
+        if (isBlocked && isEnemy && captureEdge) {
+          moves.push(destCoord);
+          break;
+        }
+        if (isBlocked) break;
+        moves.push(destCoord);
+      }
+    }
+    return moves;
+  }
+
+  static genPawnMove(cell, directions, board) {
+    let moves = [];
+    let isInitial = cell.coords.y == 7;
+    let coordA = Vec.sum(cell.coords, new Vec(-1, -1));
+    let coordB = Vec.sum(cell.coords, new Vec(1, -1));
+    let diagonalCoords = [coordA, coordB];
+    for (let coord of diagonalCoords) {
+      if (Matrix.isInsideBound(coord, boardSize)) {
+        let pieceA = Matrix.findCellByPos(coord, board).piece;
+        let pieceB = cell.piece;
+        if (pieceA && !isEqualTeam(pieceA, pieceB)) moves.push(coord);
+      }
+    }
+    let allowTwo = isInitial && moves.length == 0;
+    moves.push(
+      ...this.genLinearMoves(cell, directions, board, allowTwo ? 2 : 1)
+    );
+    return moves;
+  }
+
+  static genLShapedMoves(cell, directions, board) {
+    let moves = [];
+    directions.map((dir) => {
+      let edgeCoord = Vec.sum(cell.coords, Vec.multiplyByScalar(dir, 2));
+      let isHoriz = edgeCoord.x == cell.coords.x;
+      for (let step = -1; step <= 1; step++) {
+        let stepVec = new Vec(isHoriz ? step : 0, isHoriz ? 0 : step);
+        let destCoord = Vec.sum(edgeCoord, stepVec);
+        if (step !== 0 && Matrix.isInsideBound(destCoord, boardSize)) {
+          let destCell = Matrix.findCellByPos(destCoord, board);
+          let isBlocked = isEqualTeam(cell.piece, destCell.piece);
+          !isBlocked && moves.push(destCoord);
+        }
+      }
+    });
+    return moves;
+  }
+}
+
+function isEqualTeam(pieceA, pieceB) {
+  return pieceA && pieceB && pieceA[0] == pieceB[0];
 }
 
 function createMoves(cell, board) {
-  let moves = [];
-  let pieceId = Number(cell.piece[1]);
-  let pieceTeam = cell.piece[0];
-  let boardRect = new Vec(boardSize, boardSize);
-  let directions = moveDirections[pieceId];
-
-  if (
-    pieceId == pieces.queen ||
-    pieceId == pieces.bishop ||
-    pieceId == pieces.rook
-  ) {
-    directions.forEach((direction) => {
-      let nextCell = Vec.sum(cell.coords, direction);
-      while (Vec.isInsideRectBound(nextCell, boardRect)) {
-        let cellIndex = Vec.calcFlatIndex(nextCell);
-        let blockedPiece = board[cellIndex].piece;
-        if (blockedPiece) {
-          let isSameTeam = blockedPiece[0] == pieceTeam;
-          if (isSameTeam) break;
-          moves.push(nextCell);
-          break;
-        }
-        moves.push(nextCell);
-        nextCell = Vec.sum(nextCell, direction);
-      }
-    });
-  }
-
-  if (pieceId == pieces.pawn) {
-    let isInitial = cell.coords.y == 7;
-    let isDiagonalEnemy = false;
-    let isBlocked = false;
-    for (let dir of directions) {
-      let nextCellPos = Vec.sum(cell.coords, dir);
-      let isDiagonal = Matrix.isDiagonal(cell.coords, nextCellPos);
-      if (Matrix.isInsideBound(nextCellPos, boardSize)) {
-        let nextCell = Matrix.findCellByPos(nextCellPos, board);
-        let isDiagonalOpp = isDiagonal && isOpponent(cell, nextCell);
-        isBlocked = !isDiagonal && !!nextCell.piece;
-        if (isDiagonalOpp) {
-          isDiagonalEnemy = true;
-          moves.push(nextCellPos);
-        }
-        if (!isBlocked && !isDiagonal) moves.push(nextCellPos);
-      }
-    }
-    if (!isDiagonalEnemy && !isBlocked && isInitial) {
-      let extCoords = Vec.sum(cell.coords, new Vec(0, -2));
-      let extCell = Matrix.findCellByPos(extCoords, board);
-      let isExtBlocked = !!extCell.piece;
-      !isExtBlocked && moves.push(Vec.sum(cell.coords, new Vec(0, -2)));
-      console.log("initial move");
-    }
-  }
-
-  return moves;
+  let movementSys = new MovementSys(cell, board);
+  return movementSys.moves;
 }
 
 function movePiece(currCell, destCell, board) {
@@ -206,8 +251,8 @@ function movePiece(currCell, destCell, board) {
 Game.prototype.getValidMoves = function (cell) {
   this.board = this.board.map((cell) => ({ ...cell, isValidMove: false }));
   if (!cell.piece) return this.board;
-  let moves = createMoves(cell, this.board);
-  moves.forEach((move) => {
+  let moveSys = new MovementSys(cell, this.board);
+  moveSys.moves.forEach((move) => {
     this.board[Vec.calcFlatIndex(move)].isValidMove = true;
   });
   return this.board;
