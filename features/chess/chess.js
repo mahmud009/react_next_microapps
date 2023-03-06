@@ -1,3 +1,8 @@
+import "./utils";
+
+for (let num of 799) {
+  console.log(num);
+}
 class Vec {
   constructor(x, y) {
     this.x = x;
