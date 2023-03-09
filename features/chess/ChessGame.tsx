@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid";
 import { FaChessPawn, FaChessQueen } from "react-icons/fa";
 import { Text } from "components/reusables/Text";
 // import { Game } from "./chess";
-import { game, Piece } from "./chessV2";
+import { game, Piece, createMoves } from "./chessV2";
 
 let cellSize = 64;
 let pieceSize = 56;
@@ -24,6 +24,7 @@ let colors = {
 export function ChessGame() {
   const [board, setBoard] = useState(game.board.content);
   const [lockedCell, setLockedCell] = useState<any>(null);
+  const [moves, setMoves] = useState<any>([]);
 
   // React.useEffect(() => {
   //   setBoard(game.board);
@@ -40,6 +41,12 @@ export function ChessGame() {
   //   setLockedCell(cell.piece ? cell : null);
   //   setBoard([...board]);
   // };
+
+  const handleCellClick = (piece: null | Piece) => {
+    if (!piece) return;
+    let moves = createMoves(piece);
+    setMoves(moves);
+  };
 
   return (
     <Box
@@ -62,52 +69,54 @@ export function ChessGame() {
       >
         {board.length > 0
           ? board.map((cell: Piece | null, idx) => {
-              let coords = {
-                x: idx % 8,
-                y: Math.floor(idx / 8),
-              };
+              let cellX = idx % 8;
+              let cellY = Math.floor(idx / 8);
               let piece = cell;
-              let pieceColor = "";
-              if (cell) {
-                pieceColor =
-                  cell.group == "A" ? colors.piece.light : colors.piece.dark;
-              }
-              let bgColor =
-                (coords.x + coords.y) % 2 == 0
-                  ? colors.cell.light
-                  : colors.cell.dark;
 
               return (
                 <Box
                   key={uuid()}
                   width={`${cellSize}px`}
                   height={`${cellSize}px`}
-                  backgroundColor={bgColor}
+                  backgroundColor={
+                    (cellX + cellY) % 2 == 0
+                      ? colors.cell.light
+                      : colors.cell.dark
+                  }
                   display="flex"
                   justifyContent={"center"}
                   alignItems="center"
                   lineHeight={1}
                   position="relative"
-                  // onClick={() => handleMove(cell)}
+                  onClick={() => handleCellClick(cell)}
                   cursor={piece ? "pointer" : "inherit"}
                 >
-                  <Box
-                    position="absolute"
-                    top="50%"
-                    left="50%"
-                    transform={"translate(-50%, -50%)"}
-                    fontSize={`${pieceSize}px`}
-                    color={pieceColor}
-                    pointerEvents="none"
-                  >
-                    {piece?.type == 1 ? <>&#9818;</> : null}
-                    {piece?.type == 2 ? <>&#9823;</> : null}
-                    {piece?.type == 3 ? <>&#9822;</> : null}
-                    {piece?.type == 4 ? <>&#9821;</> : null}
-                    {piece?.type == 5 ? <>&#9820;</> : null}
-                    {piece?.type == 6 ? <>&#9819;</> : null}
-                  </Box>
-                  {/* {cell.isValidMove ? (
+                  {piece ? (
+                    <Box
+                      position="absolute"
+                      top="50%"
+                      left="50%"
+                      transform={"translate(-50%, -50%)"}
+                      fontSize={`${pieceSize}px`}
+                      color={
+                        piece.group == "A"
+                          ? colors.piece.light
+                          : colors.piece.dark
+                      }
+                      pointerEvents="none"
+                    >
+                      {piece?.type == 1 ? <>&#9818;</> : null}
+                      {piece?.type == 2 ? <>&#9823;</> : null}
+                      {piece?.type == 3 ? <>&#9822;</> : null}
+                      {piece?.type == 4 ? <>&#9821;</> : null}
+                      {piece?.type == 5 ? <>&#9820;</> : null}
+                      {piece?.type == 6 ? <>&#9819;</> : null}
+                    </Box>
+                  ) : null}
+
+                  {moves.some(
+                    (move: any) => move.x == cellX && move.y == cellY
+                  ) ? (
                     <Box
                       position="absolute"
                       top="50%"
@@ -121,7 +130,7 @@ export function ChessGame() {
                       borderColor={colors.validCell}
                       boxShadow={`1px 1px 8px 1px inset ${colors.validCell}, -1px -1px 8px 1px inset ${colors.validCell} `}
                     />
-                  ) : null} */}
+                  ) : null}
                   <Box position="absolute" bottom={"0"} right="0">
                     <Text
                       fontSize={"12px"}
@@ -129,7 +138,7 @@ export function ChessGame() {
                       margin={0}
                       color={colors.validCell}
                     >
-                      {coords.x}, {coords.y}
+                      {cellX}, {cellY}
                     </Text>
                   </Box>
                 </Box>
