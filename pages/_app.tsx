@@ -6,12 +6,14 @@ import { ChessGame } from "features/chess";
 import "styles/globals.scss";
 import { ProfileContainer } from "@/features/profiles";
 import { Canvas } from "@/components/reusables/Canvas/Canvas";
+import { TicTocToeGame } from "@/features/tic_toc_toe/TicTocToeGame";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <Box>
       {/* <Canvas /> */}
       <ChessGame />
+      {/* <TicTocToeGame /> */}
     </Box>
   );
 }
