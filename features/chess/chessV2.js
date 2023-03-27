@@ -57,6 +57,10 @@ class Matrix {
   }
 }
 
+function isEqualTeam(pieceA, pieceB) {
+  return pieceA && pieceB && pieceA.group == pieceB.group;
+}
+
 function rayTraceCells(matrix, pos, dirs, dist) {
   let coords = [];
   for (let dir of dirs) {
@@ -69,6 +73,10 @@ function rayTraceCells(matrix, pos, dirs, dist) {
   }
   return coords;
 }
+
+//
+
+function findBoundary() {}
 
 export function linearMoves(piece, directions, board, distance) {
   let moves = [];
@@ -93,17 +101,15 @@ export function linearMoves(piece, directions, board, distance) {
 function pawnMoves(piece, directions, board) {
   let moves = [];
   let coords = rayTraceCells(board, piece.coord, directions, 1);
-  let isInitial = piece.coord.y == 7;
+  let isInitial = piece.coord.y == 6;
+  let isVertBlocked = false;
   for (let coord of coords) {
-    let pieceA = board.get(coord);
-    // if (pieceA && !isEqualTeam(pieceA, piece)) {
-    //   moves.push(coord);
-    // }
-    moves.push(coord);
+    let blockedPiece = board.get(coord);
+    let isDiagonal = piece.coord.isDiagonal(coord);
+    let isOpponent = !!blockedPiece && !isEqualTeam(piece, blockedPiece);
+    if (!!blockedPiece && isDiagonal && isOpponent) moves.push(coord);
+    if (!isDiagonal && !blockedPiece) isVertBlocked = true;
   }
-  console.log(moves);
-  let allowTwo = isInitial && moves.length == 0;
-  moves.push(linearMoves(piece, directions, board, allowTwo ? 2 : 1));
   return moves;
 }
 

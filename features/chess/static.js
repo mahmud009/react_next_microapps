@@ -10,12 +10,12 @@ export let pieces = {
 };
 
 export let pieceMap = [
-  [null, null, "B2", null, null, null, null, "A6"], //
-  [null, null, "B1", null, null, null, null, null], //
   [null, null, null, null, null, null, null, null], //
-  [null, null, null, null, "A2", null, null, null], //
   [null, null, null, null, null, null, null, null], //
-  [null, "B3", null, null, "A4", "B4", "B4", null], //
+  [null, null, null, null, null, null, null, null], //
+  [null, null, null, null, null, null, null, null], //
+  [null, null, null, null, null, null, null, null], //
+  [null, "B3", null, "A3", "A4", null, null, null], //
   ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"], //
   ["A5", "A3", "A4", "A6", "A1", "A4", "A3", "A5"], //
 ];
@@ -32,7 +32,7 @@ export let moveDirections = {
     [-1, 0],
     [0, -1],
   ],
-  2: [[0, -1], [1, - 1], [-1, -1]],
+  2: [[1, - 1], [-1, -1]],
   3: [
     [0, -1],
     [0, 1],
