@@ -61,41 +61,28 @@ function isEqualTeam(pieceA, pieceB) {
   return pieceA && pieceB && pieceA.group == pieceB.group;
 }
 
+function validDest(from, to, board) {
+  let piece = board.get(from);
+  let destCell = board.get(to);
+  let isBlocked = destCell && destCell.type;
+  let isEnemy = isBlocked && piece.group !== destCell.group;
+  let result = isBlocked ? false : true;
+  if (isEnemy) result = true;
+  return result;
+}
+
 function rayTraceCells(matrix, pos, dirs, dist) {
   let coords = [];
   for (let dir of dirs) {
     for (let step = 1; step <= dist; step++) {
-      let destCoord = pos.add(dir.multiply(step));
-      if (matrix.isInside(destCoord)) {
-        coords.push(destCoord);
+      let dest = pos.add(dir.multiply(step));
+      if (!matrix.isInside(dest)) break;
+      if (validDest(pos, dest, matrix)) {
+        coords.push(dest);
       }
     }
   }
   return coords;
-}
-
-//
-
-function findBoundary() {}
-
-export function linearMoves(piece, directions, board, distance) {
-  let moves = [];
-  for (let dir of directions) {
-    for (let step = 1; step <= distance; step++) {
-      let destCoord = piece.coord.add(dir.multiply(step));
-      if (!board.isInside(destCoord)) break;
-      let destCell = board.get(destCoord);
-      let isBlocked = destCell && destCell.type;
-      let isEnemy = isBlocked && piece.group !== destCell.group;
-      if (isBlocked && isEnemy) {
-        moves.push(destCoord);
-        break;
-      }
-      if (isBlocked) break;
-      moves.push(destCoord);
-    }
-  }
-  return moves;
 }
 
 function pawnMoves(piece, directions, board) {
@@ -159,11 +146,9 @@ function createMoves(piece) {
   let directions = moveDirections[piece.type].map((dir) => {
     return new Vec(dir[0], dir[1]);
   });
-  if (piece.type > 3) {
-    moves = linearMoves(piece, directions, game.board, boardSize, true);
-  }
-  if (piece.type == 1) {
-    moves = linearMoves(piece, directions, game.board, 1, true);
+  if (piece.type > 3 || piece.type == 1) {
+    let dist = piece.type == 1 ? 1 : boardSize;
+    moves = rayTraceCells(game.board, piece.coord, directions, dist);
   }
 
   if (piece.type == 2) {

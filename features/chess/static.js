@@ -10,9 +10,9 @@ export let pieces = {
 };
 
 export let pieceMap = [
-  [null, null, null, null, null, null, null, null], //
-  [null, null, null, null, null, null, null, null], //
-  [null, null, null, null, null, null, null, null], //
+  [null, null, null, null, null, null, null, "A6"], //
+  [null, null, null, null, "B1", null, null, null], //
+  [null, null, null, null, "A1", null, null, null], //
   [null, null, null, null, null, null, null, null], //
   [null, null, null, null, null, null, null, null], //
   [null, "B3", null, "A3", "A4", null, null, null], //

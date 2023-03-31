@@ -13,9 +13,9 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <Box>
       {/* <Canvas /> */}
-      {/* <ChessGame /> */}
+      <ChessGame />
       {/* <TicTocToeGame /> */}
-      <SpringAnimation />
+      {/* <SpringAnimation /> */}
     </Box>
   );
 }
