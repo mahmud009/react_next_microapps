@@ -159,3 +159,11 @@ function createMoves(piece) {
 }
 
 export { game, createMoves };
+
+let foo = [
+  { bar: 10, alpha: "lkjda" },
+  { alpha: "lkjda" },
+  { bar: 10, alpha: "kjfds" },
+];
+
+console.log(foo.some((itm) => itm.bar && itm.bar < 10));

@@ -8,12 +8,14 @@ import { ProfileContainer } from "@/features/profiles";
 import { Canvas } from "@/components/reusables/Canvas/Canvas";
 import { TicTocToeGame } from "@/features/tic_toc_toe/TicTocToeGame";
 import { SpringAnimation } from "@/features/SpringAnimation";
+import { AnimatedPage } from "features/animatedSidebar";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <Box>
+      <AnimatedPage />
       {/* <Canvas /> */}
-      <ChessGame />
+      {/* <ChessGame /> */}
       {/* <TicTocToeGame /> */}
       {/* <SpringAnimation /> */}
     </Box>
