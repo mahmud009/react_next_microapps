@@ -12,7 +12,8 @@ export function AnimatedPage() {
       height={"100vh"}
       display="flex"
       justifyContent="flex-end"
-      overflow="hidden"
+
+      // overflow="hidden"
     >
       <SideBar />
     </Box>
