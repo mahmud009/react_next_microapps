@@ -1,4 +1,4 @@
-import { Box } from "@/components/reusables";
+import { Box } from "@/reusables/components";
 import { game } from "./ticTocToe";
 
 interface Props {

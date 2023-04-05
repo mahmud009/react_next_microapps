@@ -1,5 +1,4 @@
-import { Box } from "@/components/reusables";
-import { Button } from "@/components/reusables/Button";
+import { Box, Button } from "@/reusables/components";
 import { useSpring, animated } from "@react-spring/web";
 import React from "react";
 

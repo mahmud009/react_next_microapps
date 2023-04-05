@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Box } from "components/reusables";
+import { Box, Text } from "@/reusables/components";
 import { v4 as uuid } from "uuid";
 import { FaChessPawn, FaChessQueen } from "react-icons/fa";
-import { Text } from "components/reusables/Text";
 // import { Game } from "./chess";
 import { game, Piece, createMoves } from "./chessV2";
 

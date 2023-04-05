@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "components/reusables/Box";
+import { Box } from "@/reusables/components";
 
 let intensity = 0.7;
 let blockDimension = { width: 50, height: 50 };
