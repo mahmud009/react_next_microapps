@@ -1,13 +1,16 @@
-import styled from "styled-components";
-
 export interface ButtonProps extends React.CSSProperties {
   children?: React.ReactNode;
   onClick?: (e: any) => void;
 }
 
+const css = {
+  default: {},
+};
+
 export function Button({ children, onClick, ...cssProps }: ButtonProps) {
-  let Styled = styled.button({
-    ...cssProps,
-  });
-  return <Styled onClick={onClick}>{children}</Styled>;
+  return (
+    <button css={css.default} style={cssProps} onClick={onClick}>
+      {children}
+    </button>
+  );
 }

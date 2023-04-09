@@ -19,13 +19,7 @@ class Vec {
 
   // prettier-ignore
   isDiagonal(vec) {
-    let digonalDirs = [new Vec(-1, -1), new Vec(1, -1), new Vec(1, 1), new Vec(-1, 1)];
-    for (let dir of digonalDirs) {
-      if (this.isEqual(vec.add(dir))) {
-        return true;
-      }
-    }
-    return false;
+    return !(vec.x == 0 || vec.y == 0);
   }
 }
 
@@ -62,41 +56,68 @@ function isEqualTeam(pieceA, pieceB) {
 }
 
 function validDest(from, to, board) {
-  let piece = board.get(from);
-  let destCell = board.get(to);
-  let isBlocked = destCell && destCell.type;
-  let isEnemy = isBlocked && piece.group !== destCell.group;
-  let result = isBlocked ? false : true;
-  if (isEnemy) result = true;
-  return result;
+  if (board.isInside(to)) {
+    let piece = board.get(from);
+    let destCell = board.get(to);
+    let isBlocked = destCell && destCell.type;
+    let isEnemy = isBlocked && piece.group !== destCell.group;
+    return { isBlocked, isEnemy, isInside: true };
+  } else {
+    return { isBlocked: false, isEnemy: false, isInside: false };
+  }
 }
 
-function rayTraceCells(matrix, pos, dirs, dist) {
+function rayTraceCells(board, pos, dirs, dist, canCapture = true) {
   let coords = [];
   for (let dir of dirs) {
     for (let step = 1; step <= dist; step++) {
       let dest = pos.add(dir.multiply(step));
-      if (!matrix.isInside(dest)) break;
-      if (validDest(pos, dest, matrix)) {
-        coords.push(dest);
-      }
+      let { isBlocked, isEnemy, isInside } = validDest(pos, dest, board);
+      if (!isBlocked || (isEnemy && canCapture)) coords.push(dest);
+      if (isBlocked || !isInside) break;
     }
   }
   return coords;
 }
 
-function pawnMoves(piece, directions, board) {
+function pawnMoves(piece, dirs, board) {
   let moves = [];
-  let coords = rayTraceCells(board, piece.coord, directions, 1);
+  let coords = [];
   let isInitial = piece.coord.y == 6;
-  let isVertBlocked = false;
-  for (let coord of coords) {
-    let blockedPiece = board.get(coord);
-    let isDiagonal = piece.coord.isDiagonal(coord);
-    let isOpponent = !!blockedPiece && !isEqualTeam(piece, blockedPiece);
-    if (!!blockedPiece && isDiagonal && isOpponent) moves.push(coord);
-    if (!isDiagonal && !blockedPiece) isVertBlocked = true;
+  let isDiagEnemy = true;
+  dirs = dirs.filter((dir) => {
+    if (
+      piece.coord.isDiagonal(dir) &&
+      board.get(piece.coord.add(dir)) !== null
+    ) {
+      return dir;
+    }
+    if (
+      !piece.coord.isDiagonal(dir) &&
+      board.get(piece.coord.add(dir)) == null
+    ) {
+      return dir;
+    }
+  });
+
+  coords = rayTraceCells(board, piece.coord, dirs, 1, true);
+
+  // let vertDirs = dirs.filter((dir) => !piece.coord.isDiagonal(dir));
+  if (isDiagEnemy) {
+    // create moves in all directions
+  } else {
+    // create moves only vertical direction
+    // coords = rayTraceCells(
+    //   board,
+    //   piece.coord,
+    //   vertDirs,
+    //   isInitial ? 2 : 1,
+    //   false
+    // );
   }
+
+  moves.push(...coords);
+
   return moves;
 }
 
@@ -159,11 +180,3 @@ function createMoves(piece) {
 }
 
 export { game, createMoves };
-
-let foo = [
-  { bar: 10, alpha: "lkjda" },
-  { alpha: "lkjda" },
-  { bar: 10, alpha: "kjfds" },
-];
-
-console.log(foo.some((itm) => itm.bar && itm.bar < 10));

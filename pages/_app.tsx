@@ -7,23 +7,28 @@ import { ChessGame } from "features/chess";
 import { TicTocToeGame } from "@/features/tic_toc_toe/TicTocToeGame";
 import { SpringAnimation } from "@/features/SpringAnimation";
 import { AnimatedPage } from "@/features/animatedPage";
-import { createGlobalStyle } from "styled-components";
+import { Global, css } from "@emotion/react";
+import { theme } from "@/reusables/theme";
 
-const GlobalStyles = createGlobalStyle`
-  *  {
-    margin : 0;
-    padding : 0;
+const globalStyles = css`
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: ${theme.colors.neutral};
   }
 `;
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
-      <GlobalStyles />
+      <Global styles={globalStyles} />
       <Box>
-        <AnimatedPage />
+        {/* <AnimatedPage /> */}
         {/* <Canvas /> */}
-        {/* <ChessGame /> */}
+        <ChessGame />
         {/* <TicTocToeGame /> */}
         {/* <SpringAnimation /> */}
       </Box>

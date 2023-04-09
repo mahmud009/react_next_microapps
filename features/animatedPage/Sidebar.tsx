@@ -42,8 +42,8 @@ export function SideBar() {
     menuItems.map((item, index) => ({
       from: { y: 30, opacity: 0 },
       to: { y: 0, opacity: 1 },
-      delay: index * 150, // set a delay based on the index
-      config: { duration: 600 },
+      delay: index * 100, // set a delay based on the index
+      config: { duration: 200 },
     }))
   );
 

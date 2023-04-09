@@ -4,6 +4,7 @@ import { v4 as uuid } from "uuid";
 import { FaChessPawn, FaChessQueen } from "react-icons/fa";
 // import { Game } from "./chess";
 import { game, Piece, createMoves } from "./chessV2";
+import { useTheme } from "@/reusables/hooks";
 
 let cellSize = 64;
 let pieceSize = 56;
@@ -21,6 +22,7 @@ let colors = {
 };
 
 export function ChessGame() {
+  const theme = useTheme();
   const [board, setBoard] = useState(game.board.content);
   const [lockedCell, setLockedCell] = useState<any>(null);
   const [moves, setMoves] = useState<any>([]);
@@ -54,8 +56,9 @@ export function ChessGame() {
       height="100vh"
       overflow={"hidden"}
       display="flex"
-      alignItems={"flex-start"}
+      alignItems={"center"}
       justifyContent="center"
+      backgroundColor={theme.colors["base-100"]}
     >
       {/* board */}
       <Box
