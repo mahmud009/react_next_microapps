@@ -1,37 +1,42 @@
 import type { AppProps } from "next/app";
 import React from "react";
 import { ColorPicker } from "features/colorPicker";
-import { Box } from "@/reusables/components";
 import { ChessGame } from "features/chess";
 // import "styles/globals.scss";
 import { TicTocToeGame } from "@/features/tic_toc_toe/TicTocToeGame";
 import { SpringAnimation } from "@/features/SpringAnimation";
 import { AnimatedPage } from "@/features/animatedPage";
-import { Global, css } from "@emotion/react";
-import { theme } from "@/reusables/theme";
+import { muiTheme } from "@/reusables/theme";
+import { ThemeProvider } from "@mui/material";
+import { CacheProvider, EmotionCache } from "@emotion/react";
+import CssBaseline from "@mui/material/CssBaseline";
+import createEmotionCache from "@/reusables/lib/createEmotionCache";
+import Head from "next/head";
 
-const globalStyles = css`
-  * {
-    margin: 0;
-    padding: 0;
-  }
+const clientSideEmotionCache = createEmotionCache();
 
-  body {
-    background-color: ${theme.colors.neutral};
-  }
-`;
+export interface Props extends AppProps {
+  emotionCache?: EmotionCache;
+}
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({
+  Component,
+  pageProps,
+  emotionCache = clientSideEmotionCache,
+}: Props) {
   return (
-    <>
-      <Global styles={globalStyles} />
-      <Box>
-        {/* <AnimatedPage /> */}
+    <CacheProvider value={emotionCache}>
+      <Head>
+        <meta name="viewport" content="initial-scale=1, width=device-width" />
+      </Head>
+      <ThemeProvider theme={muiTheme}>
+        <CssBaseline />
+        <AnimatedPage />
         {/* <Canvas /> */}
-        <ChessGame />
+        {/* <ChessGame /> */}
         {/* <TicTocToeGame /> */}
         {/* <SpringAnimation /> */}
-      </Box>
-    </>
+      </ThemeProvider>
+    </CacheProvider>
   );
 }
