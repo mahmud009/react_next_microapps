@@ -2,7 +2,6 @@ import type { AppProps } from "next/app";
 import React from "react";
 import { ColorPicker } from "features/colorPicker";
 import { ChessGame } from "features/chess";
-// import "styles/globals.scss";
 import { TicTocToeGame } from "@/features/tic_toc_toe/TicTocToeGame";
 import { SpringAnimation } from "@/features/SpringAnimation";
 import { AnimatedPage } from "@/features/animatedPage";

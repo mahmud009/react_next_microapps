@@ -17,7 +17,6 @@ class Vec {
     return this.x == vec.x && this.y == vec.y;
   }
 
-  // prettier-ignore
   isDiagonal(vec) {
     return !(vec.x == 0 || vec.y == 0);
   }
@@ -81,44 +80,19 @@ function rayTraceCells(board, pos, dirs, dist, canCapture = true) {
 }
 
 function pawnMoves(piece, dirs, board) {
-  let moves = [];
-  let coords = [];
   let isInitial = piece.coord.y == 6;
-  let isDiagEnemy = true;
+  let isDiagEnemy = false;
   dirs = dirs.filter((dir) => {
-    if (
-      piece.coord.isDiagonal(dir) &&
-      board.get(piece.coord.add(dir)) !== null
-    ) {
-      return dir;
-    }
-    if (
-      !piece.coord.isDiagonal(dir) &&
-      board.get(piece.coord.add(dir)) == null
-    ) {
-      return dir;
-    }
+    let from = piece.coord;
+    let to = piece.coord.add(dir);
+    let { isBlocked, isEnemy } = validDest(from, to, board);
+    let isDiagDir = piece.coord.isDiagonal(dir);
+    if (!isDiagEnemy) isDiagEnemy = isDiagDir && isEnemy;
+    if ((isDiagDir && isEnemy) || (!isDiagDir && !isBlocked)) return true;
+    return false;
   });
-
-  coords = rayTraceCells(board, piece.coord, dirs, 1, true);
-
-  // let vertDirs = dirs.filter((dir) => !piece.coord.isDiagonal(dir));
-  if (isDiagEnemy) {
-    // create moves in all directions
-  } else {
-    // create moves only vertical direction
-    // coords = rayTraceCells(
-    //   board,
-    //   piece.coord,
-    //   vertDirs,
-    //   isInitial ? 2 : 1,
-    //   false
-    // );
-  }
-
-  moves.push(...coords);
-
-  return moves;
+  let dist = isInitial && !isDiagEnemy ? 2 : 1;
+  return rayTraceCells(board, piece.coord, dirs, dist, isDiagEnemy);
 }
 
 function knightMoves(cell, directions, board) {
