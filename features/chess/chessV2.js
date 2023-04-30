@@ -95,25 +95,22 @@ function pawnMoves(piece, dirs, board) {
   return rayTraceCells(board, piece.coord, dirs, dist, isDiagEnemy);
 }
 
-function knightMoves(cell, directions, board) {
+function knightMoves(piece, directions, board) {
   let moves = [];
   directions.map((dir) => {
-    let edgeCoord = Vec.sum(cell.coords, Vec.multiplyByScalar(dir, 2));
-    let isHoriz = edgeCoord.x == cell.coords.x;
-    for (let step = -1; step <= 1; step++) {
+    let edgeCoord = piece.coord.add(dir.multiply(2));
+    let isHoriz = edgeCoord.x == piece.coord.x;
+    for (let step = -1; step <= 1; step += 2) {
       let stepVec = new Vec(isHoriz ? step : 0, isHoriz ? 0 : step);
-      let destCoord = Vec.sum(edgeCoord, stepVec);
-      if (step !== 0 && Matrix.isInsideBound(destCoord, boardSize)) {
-        let destCell = Matrix.findCellByPos(destCoord, board);
-        let isBlocked = isEqualTeam(cell.piece, destCell.piece);
-        !isBlocked && moves.push(destCoord);
-      }
+      let destCoord = edgeCoord.add(stepVec);
+      let { isBlocked, isEnemy } = validDest(piece.coord, destCoord, board);
+      if (!isBlocked || isEnemy) moves.push(destCoord);
     }
   });
   return moves;
 }
 
-export class Piece {
+class Piece {
   constructor(type, group, coord) {
     this.type = Number(type);
     this.group = group;
@@ -146,6 +143,9 @@ function createMoves(piece) {
     moves = rayTraceCells(game.board, piece.coord, directions, dist);
   }
 
+  if (piece.type == 3) {
+    moves = knightMoves(piece, directions, game.board);
+  }
   if (piece.type == 2) {
     moves = pawnMoves(piece, directions, game.board);
   }

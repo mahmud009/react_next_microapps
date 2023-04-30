@@ -30,9 +30,9 @@ export default function App({
       </Head>
       <ThemeProvider theme={muiTheme}>
         <CssBaseline />
-        <AnimatedPage />
+        {/* <AnimatedPage /> */}
         {/* <Canvas /> */}
-        {/* <ChessGame /> */}
+        <ChessGame />
         {/* <TicTocToeGame /> */}
         {/* <SpringAnimation /> */}
       </ThemeProvider>
