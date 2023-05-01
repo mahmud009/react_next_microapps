@@ -1,4 +1,4 @@
-import { pieceMap, pieces, boardSize, moveDirections } from "./static";
+import { pieceMap, boardSize, moveDirections } from "./static";
 
 class Vec {
   constructor(x, y) {
@@ -59,7 +59,7 @@ function validDest(from, to, board) {
     let piece = board.get(from);
     let destCell = board.get(to);
     let isBlocked = destCell && destCell.type;
-    let isEnemy = isBlocked && piece.group !== destCell.group;
+    let isEnemy = isBlocked && piece?.group !== destCell?.group;
     return { isBlocked, isEnemy, isInside: true };
   } else {
     return { isBlocked: false, isEnemy: false, isInside: false };
@@ -110,7 +110,7 @@ function knightMoves(piece, directions, board) {
   return moves;
 }
 
-class Piece {
+export class Piece {
   constructor(type, group, coord) {
     this.type = Number(type);
     this.group = group;

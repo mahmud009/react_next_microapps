@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { Box, Text } from "@/reusables/components";
 import { v4 as uuid } from "uuid";
 import { FaChessPawn, FaChessQueen } from "react-icons/fa";
-// import { Game } from "./chess";
-import { game, Piece, createMoves } from "./chessV2";
+import { game, createMoves, Piece } from "./chessV2";
 import { useTheme } from "@/reusables/hooks";
 
-let cellSize = 64;
-let pieceSize = 56;
-let highlighterSize = 42;
+let cellSize = 48;
+let pieceSize = 42;
+let highlighterSize = 30;
 let colors = {
   cell: {
     light: `#333446`,
@@ -70,7 +69,7 @@ export function ChessGame() {
         border="1px solid #405266"
       >
         {board.length > 0
-          ? board.map((cell: Piece | null, idx) => {
+          ? board.reverse().map((cell: Piece | null, idx) => {
               let cellX = idx % 8;
               let cellY = Math.floor(idx / 8);
               let piece = cell;
