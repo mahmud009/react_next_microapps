@@ -154,3 +154,7 @@ function createMoves(piece) {
 }
 
 export { game, createMoves };
+
+let idx = 0;
+true ? idx++ : idx--;
+console.log(idx);

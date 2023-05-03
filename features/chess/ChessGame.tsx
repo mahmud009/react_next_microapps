@@ -69,7 +69,7 @@ export function ChessGame() {
         border="1px solid #405266"
       >
         {board.length > 0
-          ? board.reverse().map((cell: Piece | null, idx) => {
+          ? board.map((cell: Piece | null, idx) => {
               let cellX = idx % 8;
               let cellY = Math.floor(idx / 8);
               let piece = cell;
