@@ -5,11 +5,14 @@ import {
   useTheme,
   Typography,
   ThemeProvider,
+  Grid,
 } from "@mui/material";
 import BannerImage from "@/public/images/home_banner_4.webp";
 import { muiTheme } from "@/reusables/theme";
 import Head from "next/head";
 import { NavItem } from "./NavItem";
+import { v4 as uuid } from "uuid";
+import { navItems } from "../config/navItems";
 
 export function AppHome() {
   const theme = useTheme();
@@ -71,9 +74,25 @@ export function AppHome() {
                     incidentally for machines to execute.
                   </Typography>
                 </Box>
-              </Stack>
 
-              <Box>{/* <NavItem  /> */}</Box>
+                <Box mt={"32px"}>
+                  <Grid container spacing={2}>
+                    {navItems.map((itm) => (
+                      <Grid item key={uuid()}>
+                        <NavItem
+                          name={itm.name}
+                          icon={itm.icon}
+                          iconColor={itm.iconColor}
+                          url={itm.url}
+                          onClick={(url) => {
+                            // go to url via router
+                          }}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+              </Stack>
             </Container>
           </Stack>
         </Box>
