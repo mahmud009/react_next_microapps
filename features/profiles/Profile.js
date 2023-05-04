@@ -1,4 +1,4 @@
-import { Box } from "components/reusables/Box";
+import { Box } from "@/reusables/components/Box";
 
 export function Profile(props) {
   return (
