@@ -13,9 +13,11 @@ import Head from "next/head";
 import { NavItem } from "./NavItem";
 import { v4 as uuid } from "uuid";
 import { navItems } from "../config/navItems";
+import React from "react";
 
 export function AppHome() {
   const theme = useTheme();
+
   return (
     <ThemeProvider theme={muiTheme}>
       <Head>

@@ -1,2 +1,1 @@
-import { AppHome } from "./components/AppHome";
-export default AppHome;
+export * from "./components/AppHome";
