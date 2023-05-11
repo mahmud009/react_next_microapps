@@ -18,6 +18,10 @@ export class Vec {
   isDiagonal(vec) {
     return !(vec.x == 0 || vec.y == 0);
   }
+
+  rotate() {
+    return this.multiply(-1);
+  }
 }
 
 export class Matrix {

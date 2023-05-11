@@ -28,6 +28,7 @@ export function rayTraceCells(board, pos, dirs, dist, canCapture = true) {
 
 export function pawnMoves(piece, dirs, board) {
   let isInitial = piece.coord.y == 6;
+  if (piece.group == "B") isInitial = piece.coord.y == 1;
   let isDiagEnemy = false;
   dirs = dirs.filter((dir) => {
     let from = piece.coord;
@@ -70,6 +71,10 @@ export function createMoves(piece, board) {
     moves = knightMoves(piece, directions, board);
   }
   if (piece.type == 2) {
+    if (piece.group == "B") {
+      directions = directions.map((vec) => vec.rotate());
+    }
+    console.log(directions);
     moves = pawnMoves(piece, directions, board);
   }
 
