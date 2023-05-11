@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Box, Text } from "@/reusables/components";
 import { v4 as uuid } from "uuid";
-import { FaChessPawn, FaChessQueen } from "react-icons/fa";
-import { game, createMoves, Piece } from "./chessV2";
+import { game, Piece } from "./chess";
+import { createMoves } from "./utils.move";
 import { useTheme } from "@/reusables/hooks";
 
 let cellSize = 48;
@@ -44,7 +44,7 @@ export function ChessGame() {
 
   const handleCellClick = (piece: null | Piece) => {
     if (!piece) return;
-    let moves = createMoves(piece);
+    let moves = createMoves(piece, game.board);
     setMoves(moves);
   };
 
