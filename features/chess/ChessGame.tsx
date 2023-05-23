@@ -26,22 +26,6 @@ export function ChessGame() {
   const [lockedCell, setLockedCell] = useState<any>(null);
   const [moves, setMoves] = useState<any>([]);
 
-  // React.useEffect(() => {
-  //   setBoard(game.board);
-  // }, []);
-
-  // const handleMove = (cell: any) => {
-  //   if (lockedCell) {
-  //     let board = game.movePiece(lockedCell, cell);
-  //     setBoard(board);
-  //     setLockedCell(null);
-  //     return;
-  //   }
-  //   let board = game.getValidMoves(cell);
-  //   setLockedCell(cell.piece ? cell : null);
-  //   setBoard([...board]);
-  // };
-
   const handleCellClick = (piece: null | Piece) => {
     if (!piece) return;
     let moves = createMoves(piece, game.board);
