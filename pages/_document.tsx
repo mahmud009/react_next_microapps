@@ -2,6 +2,7 @@ import { Html, Head, Main, NextScript, DocumentContext } from "next/document";
 import createCache from "@emotion/cache";
 import createEmotionServer from "@emotion/server/create-instance";
 import Document from "next/document";
+import Script from "next/script";
 
 const emotionCache = createCache({ key: "css" });
 emotionCache.compat = true;
