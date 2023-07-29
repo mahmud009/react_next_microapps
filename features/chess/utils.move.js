@@ -19,7 +19,9 @@ export function rayTraceCells(board, pos, dirs, dist, canCapture = true) {
     for (let step = 1; step <= dist; step++) {
       let dest = pos.add(dir.multiply(step));
       let { isBlocked, isEnemy, isInside } = validDest(pos, dest, board);
-      if (!isBlocked || (isEnemy && canCapture)) coords.push(dest);
+      if (isInside && (!isBlocked || (isEnemy && canCapture))) {
+        coords.push(dest);
+      }
       if (isBlocked || !isInside) break;
     }
   }
@@ -58,14 +60,10 @@ export function knightMoves(piece, directions, board) {
   return moves;
 }
 
-export function createMoves(piece, board) {
+export function createMoves(piece, board, directions) {
   let moves = [];
-  let directions = moveDirections[piece.type].map((dir) => {
-    return new Vec(dir[0], dir[1]);
-  });
-  if (piece.type > 3 || piece.type == 1) {
-    let dist = piece.type == 1 ? 1 : boardSize;
-    moves = rayTraceCells(board, piece.coord, directions, dist);
+  if (piece.type > 3) {
+    moves = rayTraceCells(board, piece.coord, directions, boardSize);
   }
   if (piece.type == 3) {
     moves = knightMoves(piece, directions, board);
@@ -74,9 +72,41 @@ export function createMoves(piece, board) {
     if (piece.group == "B") {
       directions = directions.map((vec) => vec.rotate());
     }
-    console.log(directions);
     moves = pawnMoves(piece, directions, board);
   }
 
   return moves;
+}
+
+export function getValidMoves(piece, board) {
+  let directions = moveDirections[piece.type].map((dir) => {
+    return new Vec(dir[0], dir[1]);
+  });
+
+  if (piece.type == 1) {
+    let moves = [];
+    let kingMoves = rayTraceCells(board, piece.coord, directions, 1);
+
+    kingMoves.forEach((coord) => {
+      let isBlocked = false;
+      board.content.forEach((itm) => {
+        let isOpponent = itm && piece.group !== itm.group;
+        if (itm && isOpponent) {
+          let otherMoves = createMoves(itm, board, directions);
+          otherMoves.forEach((otherCoord) => {
+            if (coord.isEqual(otherCoord)) {
+              isBlocked = true;
+            }
+          });
+        }
+      });
+      if (!isBlocked) {
+        moves.push(coord);
+      }
+    });
+
+    return moves;
+  }
+
+  return createMoves(piece, board, directions);
 }

@@ -14,9 +14,16 @@ import { NavItem } from "./NavItem";
 import { v4 as uuid } from "uuid";
 import { navItems } from "../config/navItems";
 import React from "react";
+import { Button } from "@/reusables/components";
 
 export function AppHome() {
   const theme = useTheme();
+
+  const [counter, setCounter] = React.useState(1);
+
+  const handleChange = () => {
+    setCounter(2);
+  };
 
   return (
     <ThemeProvider theme={muiTheme}>
@@ -27,6 +34,10 @@ export function AppHome() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
+        <Box>
+          <Box>{counter}</Box>
+          <Button onClick={() => handleChange()}>Change</Button>
+        </Box>
         <Box
           sx={{
             width: "100%",

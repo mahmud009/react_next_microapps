@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Box, Text } from "@/reusables/components";
 import { v4 as uuid } from "uuid";
-import { game, Piece } from "./chess";
-import { createMoves } from "./utils.move";
+import { computerMove, game, Piece } from "./chess";
+import { createMoves, getValidMoves } from "./utils.move";
 import { useTheme } from "@/reusables/hooks";
 
 let cellSize = 48;
@@ -28,9 +28,14 @@ export function ChessGame() {
 
   const handleCellClick = (piece: null | Piece) => {
     if (!piece) return;
-    let moves = createMoves(piece, game.board);
+    let moves = getValidMoves(piece, game.board);
+    console.log(moves);
     setMoves(moves);
   };
+
+  React.useEffect(() => {
+    computerMove("B", board);
+  }, []);
 
   return (
     <Box

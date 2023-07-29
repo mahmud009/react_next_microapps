@@ -8,8 +8,6 @@ export class Piece {
     this.coord = coord;
     this.moves = [];
   }
-  createMoves() {}
-  move() {}
 }
 
 class Game {
@@ -19,9 +17,12 @@ class Game {
       if (!item) return item;
       return new Piece(item[1], item[0], vec);
     });
+    this.status = "playing";
   }
 }
 
-let game = new Game();
+export let game = new Game();
 
-export { game };
+export function computerMove(player, board) {
+  //
+}
