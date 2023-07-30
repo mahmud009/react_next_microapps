@@ -10,19 +10,22 @@ export class Piece {
   }
 }
 
-class Game {
+export class Game {
   constructor() {
     this.board = new Matrix(new Vec(8, 8), (vec) => {
-      let item = pieceMap[vec.y][vec.x];
-      if (!item) return item;
-      return new Piece(item[1], item[0], vec);
+      let pieceCode = pieceMap[vec.y][vec.x];
+      if (pieceCode == null) return null;
+      return pieceCode;
     });
     this.status = "playing";
   }
+
+  update(pieceCode, from, to) {
+    this.board.set(from.x, from.y, null);
+    this.board.set(to.x, to.y, pieceCode);
+    return this;
+  }
 }
 
-export let game = new Game();
-
-export function computerMove(player, board) {
-  //
-}
+// Game Class
+// board

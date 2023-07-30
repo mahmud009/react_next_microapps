@@ -1,11 +1,20 @@
 import { Vec } from "./utils.math";
 import { moveDirections, boardSize } from "./static";
+import { getPieceData } from "./utils";
 
 export function validDest(from, to, board) {
   if (board.isInside(to)) {
-    let piece = board.get(from);
+    let piece;
+    let fromCell = board.get(from);
+    if (fromCell) piece = getPieceData(fromCell, from);
+
     let destCell = board.get(to);
-    let isBlocked = destCell && destCell.type;
+    let isBlocked = false;
+    if (destCell) {
+      isBlocked = true;
+      destCell = getPieceData(destCell, to);
+    }
+
     let isEnemy = isBlocked && piece?.group !== destCell?.group;
     return { isBlocked, isEnemy, isInside: true };
   } else {
@@ -78,7 +87,9 @@ export function createMoves(piece, board, directions) {
   return moves;
 }
 
-export function getValidMoves(piece, board) {
+export function getValidMoves(pieceCode, coord, board) {
+  let piece = getPieceData(pieceCode, coord);
+
   let directions = moveDirections[piece.type].map((dir) => {
     return new Vec(dir[0], dir[1]);
   });
@@ -89,10 +100,16 @@ export function getValidMoves(piece, board) {
 
     kingMoves.forEach((coord) => {
       let isBlocked = false;
-      board.content.forEach((itm) => {
-        let isOpponent = itm && piece.group !== itm.group;
-        if (itm && isOpponent) {
-          let otherMoves = createMoves(itm, board, directions);
+      board.content.forEach((itm, idx) => {
+        let otherPiece;
+        if (itm) {
+          let cellX = idx % boardSize;
+          let cellY = Math.floor(idx / boardSize);
+          otherPiece = getPieceData(itm, new Vec(cellX, cellY));
+        }
+        let isOpponent = otherPiece && piece.group !== otherPiece.group;
+        if (otherPiece && isOpponent) {
+          let otherMoves = createMoves(otherPiece, board, directions);
           otherMoves.forEach((otherCoord) => {
             if (coord.isEqual(otherCoord)) {
               isBlocked = true;

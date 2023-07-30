@@ -25,9 +25,9 @@ export class Vec {
 }
 
 export class Matrix {
-  constructor(vec, element = (vec) => null) {
-    this.width = vec.x;
-    this.height = vec.y;
+  constructor(size, element = (vec) => null) {
+    this.width = size.x;
+    this.height = size.y;
     this.content = [];
 
     for (let y = 0; y < this.height; y++) {

@@ -1,2 +1,2 @@
-import { ChessGame } from "@/features/chess";
+import { ChessGame } from "@/features/chess/components/ChessGame";
 export default ChessGame;
