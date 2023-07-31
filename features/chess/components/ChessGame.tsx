@@ -46,13 +46,14 @@ export function ChessGame() {
       display="flex"
       alignItems={"center"}
       justifyContent="center"
-      backgroundColor={theme.colors["base-100"]}
+      backgroundColor={chessTheme.colors.background}
     >
       <Board
         board={board}
         moves={lastSelection?.moves ? lastSelection.moves : []}
         onClickCell={handleCellClick}
         theme={chessTheme}
+        // isCellCoordsVisible
       />
     </Box>
   );
@@ -60,18 +61,25 @@ export function ChessGame() {
 
 function createChessTheme(): ChessTheme {
   return {
-    cellSize: 48,
-    pieceSize: 42,
+    cellSize: 84,
+    pieceSize: 48,
     highlighterSize: 30,
     colors: {
       cell: {
-        light: `#333446`,
-        dark: `#1C1D31`,
+        light: `#757575`,
+        dark: `#424242`,
       },
       piece: {
-        light: `#84C69B`,
-        dark: `#7B6CF6`,
+        light: {
+          body: `#F4F7FA`,
+          stroke: "#34364C",
+        },
+        dark: {
+          body: "#34364C",
+          stroke: "#F4F7FA",
+        },
       },
+      background: "#202124",
       validCell: "#A52A2A",
     },
   };

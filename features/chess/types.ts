@@ -10,9 +10,10 @@ export interface ChessTheme {
       dark: string;
     };
     piece: {
-      light: string;
-      dark: string;
+      light: { body: string; stroke: string };
+      dark: { body: string; stroke: string };
     };
+    background: string;
     validCell: "#A52A2A";
   };
 }

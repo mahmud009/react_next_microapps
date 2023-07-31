@@ -1,28 +1,29 @@
 import { Box, Text } from "@/reusables/components";
-import { Piece } from "../chess";
 import { v4 as uuid } from "uuid";
 import { Vec } from "../utils.math";
 import { getPieceData } from "../utils";
 import { PieceData, ChessTheme } from "../types";
+import { Piece } from "./Piece";
 
 interface Props {
   board: (string | null)[];
   theme: ChessTheme;
   moves: Vec[];
   onClickCell: (cellCoord: Vec, pieceCode?: string) => void;
+  isCellCoordsVisible?: boolean;
 }
 
 export function Board(props: Props) {
-  const { board, theme, onClickCell, moves } = props;
+  const { board, theme, onClickCell, moves, isCellCoordsVisible } = props;
 
   return (
     <Box
-      width={`${theme.cellSize * 8 + 2}px`}
+      width={`${theme.cellSize * 8}px`}
       height={`${theme.cellSize * 8}`}
       display="grid"
       gridTemplateColumns={`repeat(${8}, 1fr)`}
       gridTemplateRows={`repeat(${8}, 1fr)`}
-      border="1px solid #ffffff"
+      // border="1px solid #ffffff"
       gap={"0px"}
     >
       {board.map((cell, idx) => {
@@ -58,22 +59,29 @@ export function Board(props: Props) {
                 top="50%"
                 left="50%"
                 transform={"translate(-50%, -50%)"}
-                fontSize={`${theme.pieceSize}px`}
-                color={
-                  piece.group == "A"
-                    ? theme.colors.piece.light
-                    : theme.colors.piece.dark
-                }
-                height={"fit-content"}
-                pointerEvents="none"
-                fontFamily="Poppins"
+                // height={"fit-content"}
+                // pointerEvents="none"
+                // fontFamily="Poppins"
               >
-                {piece?.type == 1 ? <>&#9818;</> : null}
+                {piece?.type ? (
+                  <Piece
+                    type={piece.type}
+                    colors={
+                      piece.group == "A"
+                        ? theme.colors.piece.light
+                        : theme.colors.piece.dark
+                    }
+                    width={theme.pieceSize}
+                    height={theme.pieceSize}
+                  />
+                ) : null}
+
+                {/* {piece?.type == 1 ? <>&#9818;</> : null}
                 {piece?.type == 2 ? <>&#9823;</> : null}
                 {piece?.type == 3 ? <>&#9822;</> : null}
                 {piece?.type == 4 ? <>&#9821;</> : null}
                 {piece?.type == 5 ? <>&#9820;</> : null}
-                {piece?.type == 6 ? <>&#9819;</> : null}
+                {piece?.type == 6 ? <>&#9819;</> : null} */}
               </Box>
             ) : null}
 
@@ -92,16 +100,18 @@ export function Board(props: Props) {
                 boxShadow={`1px 1px 8px 1px inset ${theme.colors.validCell}, -1px -1px 8px 1px inset ${theme.colors.validCell} `}
               />
             ) : null}
-            <Box position="absolute" bottom={"0"} right="0">
-              <Text
-                fontSize={"12px"}
-                lineHeight="1"
-                margin={0}
-                color={theme.colors.validCell}
-              >
-                {cellX}, {cellY}
-              </Text>
-            </Box>
+            {isCellCoordsVisible ? (
+              <Box position="absolute" bottom={"0"} right="0">
+                <Text
+                  fontSize={"12px"}
+                  lineHeight="1"
+                  margin={0}
+                  color={theme.colors.validCell}
+                >
+                  {cellX}, {cellY}
+                </Text>
+              </Box>
+            ) : null}
           </Box>
         );
       })}

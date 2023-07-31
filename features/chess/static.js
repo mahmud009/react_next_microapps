@@ -13,10 +13,10 @@ export let pieceMap = [
   [null, null, null, null, null, null, null, null], //
   [null, null, null, null, null, null, null, null], //
   ["A1", null, null, null, null, null, null, null], //
+  [null, "B1", "B2", "B3", "B4", "B5", "B6", null], //
   [null, null, null, null, null, null, null, null], //
   [null, null, null, null, null, null, null, null], //
-  [null, null, null, null, null, null, null, null], //
-  [null, "B5", null, null, null, "B6", null, null], //
+  [null, "A1", "A2", "A3", "A4", "A5", "A6", null], //
   [null, null, null, null, null, null, null, null], //
 ];
 
